@@ -8,7 +8,7 @@ import pandas as pd
 # functions typing
 from typing import Optional, Tuple, List, Union, Dict
 
-def connect_to_database(database: str, credentials_dict: Dict[str, str]) -> Optional[psycopg2.extensions.connection]:
+def connect_to_database(credentials_dict: Dict[str, str], autocommit=True) -> Optional[psycopg2.extensions.connection]:
     """
     Connects to a PostgreSQL database using provided credentials.
 
@@ -24,14 +24,19 @@ def connect_to_database(database: str, credentials_dict: Dict[str, str]) -> Opti
     Optional[psycopg2.extensions.connection]
         A PostgreSQL database connection if successful, None otherwise.
     """
+    
+
     try:
         connection = psycopg2.connect(
-            database=database,
+            database=credentials_dict["database"],
             user=credentials_dict["username"],
             password=credentials_dict["password"],
-            host="localhost",
-            port="5432"
+            host=credentials_dict["host"],
+            port=credentials_dict["port"]
         )
+
+        # connection.autocommit = autocommit
+
         return connection
     except OperationalError as e:
         if e.pgcode == errorcodes.INVALID_PASSWORD:
